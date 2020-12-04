@@ -454,8 +454,6 @@ function getWebpackResolver(
   };
 }
 
-const matchCss = /\.css$/i;
-
 function getWebpackImporter(loaderContext, implementation, includePaths) {
   const resolve = getWebpackResolver(
     loaderContext.getResolve,
@@ -467,12 +465,31 @@ function getWebpackImporter(loaderContext, implementation, includePaths) {
   return (originalUrl, prev, done) => {
     resolve(prev, originalUrl)
       .then((result) => {
+        let normalizedResult = path.normalize(result);
+
         // Add the result as dependency.
         // Although we're also using stats.includedFiles, this might come in handy when an error occurs.
         // In this case, we don't get stats.includedFiles from node-sass/sass.
-        loaderContext.addDependency(path.normalize(result));
-        // By removing the CSS file extension, we trigger node-sass to include the CSS file instead of just linking it.
-        done({ file: result.replace(matchCss, "") });
+        loaderContext.addDependency(normalizedResult);
+
+        const extension = path.extname(normalizedResult);
+
+        if (extension.toLowerCase() === ".css") {
+          // By removing the CSS file extension, we trigger node-sass to include the CSS file instead of just linking it.
+          normalizedResult = normalizedResult.replace(/\.css$/i, "");
+        } else {
+          // Allows `dart-sass` to resolve `.import` files
+          const basename = path.basename(normalizedResult, extension);
+
+          if (path.extname(basename) === ".import") {
+            normalizedResult = normalizedResult.replace(
+              new RegExp(`.import${extension}$`),
+              extension
+            );
+          }
+        }
+
+        done({ file: normalizedResult });
       })
       // Catch all resolving errors, return the original file and pass responsibility back to other custom importers
       .catch(() => {
