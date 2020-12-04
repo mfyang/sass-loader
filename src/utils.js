@@ -365,7 +365,7 @@ function getWebpackResolver(
       extensions: [".sass", ".scss", ".css"],
       exportsFields: [],
       mainFields: [],
-      mainFiles: ["_index", "index"],
+      mainFiles: ["_index.import", "_index", "index.import", "index"],
       modules: [],
       restrictions: [/\.((sa|sc|c)ss)$/i],
     })
@@ -374,7 +374,7 @@ function getWebpackResolver(
     resolverFactory({
       conditionNames: ["sass", "style"],
       mainFields: ["sass", "style", "main", "..."],
-      mainFiles: ["_index", "index", "..."],
+      mainFiles: ["_index.import", "_index", "index.import", "index", "..."],
       extensions: [".sass", ".scss", ".css"],
       restrictions: [/\.((sa|sc|c)ss)$/i],
     })
