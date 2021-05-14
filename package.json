@@ -92,7 +92,7 @@
     "semver": "^7.3.5",
     "standard-version": "^9.3.0",
     "style-loader": "^2.0.0",
-    "webpack": "^5.36.2"
+    "webpack": "^4.0"
   },
   "keywords": [
     "sass",
